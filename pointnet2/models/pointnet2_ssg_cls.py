@@ -127,6 +127,12 @@ class PointNet2ClassificationSSG(pl.LightningModule):
 
         logits = self.forward(pc)
         loss = F.cross_entropy(logits, labels)
+        if batch_idx == 1:
+            print(logits.shape)
+            print(labels.shape)
+            print(labels)
+            exit(0)
+            
         with torch.no_grad():
             acc = (torch.argmax(logits, dim=1) == labels).float().mean()
 

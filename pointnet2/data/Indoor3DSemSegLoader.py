@@ -81,6 +81,7 @@ class Indoor3DSemSeg(data.Dataset):
         current_points = torch.from_numpy(self.points[idx, pt_idxs].copy()).float()
         current_labels = torch.from_numpy(self.labels[idx, pt_idxs].copy()).long()
 
+        print(current_labels.shape)
         return current_points, current_labels
 
     def __len__(self):
@@ -100,5 +101,7 @@ if __name__ == "__main__":
     dloader = torch.utils.data.DataLoader(dset, batch_size=1, shuffle=True)
     for i, data in enumerate(dloader, 0):
         inputs, labels = data
-        if i == len(dloader) - 1:
-            print(inputs.size())
+        print(labels.shape)
+        print(labels)
+        # if i == len(dloader) - 1:
+            # print(inputs.size())

@@ -35,7 +35,7 @@ class Indoor3DSemSeg(data.Dataset):
         if download and not os.path.exists(self.data_dir):
             zipfile = os.path.join(BASE_DIR, os.path.basename(self.url))
             subprocess.check_call(
-                shlex.split("curl {} -o {}".format(self.url, zipfile))
+                shlex.split("curl {} -k -o {}".format(self.url, zipfile))
             )
 
             subprocess.check_call(
@@ -56,8 +56,7 @@ class Indoor3DSemSeg(data.Dataset):
             data, label = _load_data_file(os.path.join(BASE_DIR, f))
             data_batchlist.append(data)
             label_batchlist.append(label)
-
-        data_batches = np.concatenate(data_batchlist, 0)
+            data_batches = np.concatenate(data_batchlist, 0)
         labels_batches = np.concatenate(label_batchlist, 0)
 
         test_area = "Area_5"
@@ -95,10 +94,10 @@ class Indoor3DSemSeg(data.Dataset):
 
 
 if __name__ == "__main__":
-    dset = Indoor3DSemSeg(16, "./", train=True)
+    dset = Indoor3DSemSeg(16, train=True)
     print(dset[0])
     print(len(dset))
-    dloader = torch.utils.data.DataLoader(dset, batch_size=32, shuffle=True)
+    dloader = torch.utils.data.DataLoader(dset, batch_size=1, shuffle=True)
     for i, data in enumerate(dloader, 0):
         inputs, labels = data
         if i == len(dloader) - 1:

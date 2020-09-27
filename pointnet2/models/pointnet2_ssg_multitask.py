@@ -1,14 +1,17 @@
 import pytorch_lightning as pl
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from pointnet2_ops.pointnet2_modules import PointnetFPModule, PointnetSAModule
 from torch.utils.data import DataLoader
 
 from pointnet2.data import Indoor3DSemSeg
 from pointnet2.models.pointnet2_ssg_cls import PointNet2ClassificationSSG
 
+from pointnet2.utils import Visualizer
 
-class PointNet2SemSegSSG(PointNet2ClassificationSSG):
+
+class PointNet2MultitaskSSG(PointNet2ClassificationSSG):
     def _build_model(self):
         self.SA_modules = nn.ModuleList()
         self.SA_modules.append(
@@ -88,6 +91,27 @@ class PointNet2SemSegSSG(PointNet2ClassificationSSG):
             )
 
         return self.fc_lyaer(l_features[0])
+    
+
+    def training_step(self, batch, batch_idx):
+        pc, labels = batch
+
+        logits = self.forward(pc)
+        loss = F.cross_entropy(logits, labels)
+        if batch_idx == 10:
+            vis = Visualizer("../outputs/temp")
+            xyz, _ = self._break_up_pc(pc)
+            print(type(xyz[0]))
+            vis.save(xyz[0], labels[0], "test2")
+            exit(0)
+            
+        with torch.no_grad():
+            acc = (torch.argmax(logits, dim=1) == labels).float().mean()
+
+        log = dict(train_loss=loss, train_acc=acc)
+
+        return dict(loss=loss, log=log, progress_bar=dict(train_acc=acc))
+
 
     def prepare_data(self):
         self.train_dset = Indoor3DSemSeg(self.hparams["num_points"], train=True)

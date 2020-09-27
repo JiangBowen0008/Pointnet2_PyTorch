@@ -101,7 +101,5 @@ if __name__ == "__main__":
     dloader = torch.utils.data.DataLoader(dset, batch_size=1, shuffle=True)
     for i, data in enumerate(dloader, 0):
         inputs, labels = data
-        print(labels.shape)
-        print(labels)
         # if i == len(dloader) - 1:
             # print(inputs.size())
